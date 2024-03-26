@@ -2,7 +2,10 @@
 simple python script to run a claude 3 bot for your discord server
 
 # how to run
-`python3 main.py`
+```
+pip install -r requirements.txt
+python3 main.py
+```
 
 # features
 - replies to discord messages with output from anthropic's API
