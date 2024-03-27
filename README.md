@@ -26,7 +26,7 @@ python3 main.py
 # extra notes
 - rarely, the script misses a message (I blame discord). this is why I added the status updates. if you don't immediately get a reply, the script never saw the message
 - this script was written almost entirely by claude 3 opus, directed by me. neat!
-- rarely, claude will wrap the output in fake <response> tags. I assume this is because of the user tags. you could probably stop this by changing the system prompt or request formatting
+- very rarely, claude will wrap the output in fake tags. I assume this is because of the user tags. you could probably stop this by changing the system prompt or request formatting
 - anthropic doesn't have a pre-request token counter in their python lib so I just use tiktoken. close enough
 - I run mine on aws lightsail, but you can run yours locally or whatever
 - sometimes it throws exceptions but it keeps working anyways lol
