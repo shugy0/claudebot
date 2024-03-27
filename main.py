@@ -60,13 +60,23 @@ async def on_message(message):
             await message.reply(f"Please provide a non-empty message.", allowed_mentions=discord.AllowedMentions.none())
             return
         
-        # Add user ID and username to the prompt
-        prompt = f"<userID>{message.author.id}</userID>\n<username>{message.author.name}</username>\n{prompt}"
+        # Check if the message is a reply to another message
+        if message.reference:
+            try:
+                replied_message = await message.channel.fetch_message(message.reference.message_id)
+                # Add the replied message and username to the prompt
+                prompt = f"<userID>{message.author.id}</userID>\n<username>{message.author.name}</username>\n<replied_username>{replied_message.author.name}</replied_username>\n<message_user_replied_to>{replied_message.content}</message_user_replied_to>\n{prompt}"
+            except discord.NotFound:
+                # Handle the case when the replied message is not found
+                prompt = f"Error: Discord couldn't find the replied message.\n<userID>{message.author.id}</userID>\n<username>{message.author.name}</username>\n{prompt}"
+        else:
+            # Just add user ID and username to the prompt
+            prompt = f"<userID>{message.author.id}</userID>\n<username>{message.author.name}</username>\n{prompt}"
 
         # Check the token length of the prompt
         token_length = count_tokens(prompt)
         logger.info(f"Token length: {token_length}")
-        if token_length > 500:
+        if token_length > 1000:
             await message.reply(f"Sorry, your message is too long.", allowed_mentions=discord.AllowedMentions.none())
             return
 
@@ -91,7 +101,7 @@ async def generate_response(prompt, status_message):
 
         # Send the prompt to the Anthropic API
         response = anthropic_client.messages.create(
-            system="You are replying to a discord message. The userID and username are for logging purposes. Have fun and don't be too uptight.",
+            system="You are replying to a discord message. The userID, username, and replied_username are for logging purposes. If there is a message that the user replied to, it will be included in message_user_replied_to. Have fun and don't be too uptight. Do not use tags in your messages unless specifically asked to.",
             messages=[{"role": "user", "content": f"{prompt}"}],
             model="claude-3-opus-20240229",
             max_tokens=1000,
